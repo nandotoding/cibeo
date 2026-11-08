@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+alembic
+psycopg[binary]
+jinja2
+python-multipart
+argon2-cffi
+python-dotenv
+httpx2
+

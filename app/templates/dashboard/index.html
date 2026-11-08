@@ -1,0 +1,62 @@
+
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Cibeo{% endblock %}
+
+{% block body %}
+
+<div class="dashboard-page">
+
+    <header class="dashboard-header">
+        <div class="dashboard-brand">
+            <div class="brand-icon">C</div>
+            <div>
+                <h1>Cibeo</h1>
+                <p>Personal Finance Management</p>
+            </div>
+        </div>
+
+        <form method="POST" action="/logout">
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token }}"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-outline"
+                data-confirm="Are you sure you want to sign out?"
+            >
+                Sign Out
+            </button>
+        </form>
+    </header>
+
+    <main class="dashboard-content">
+
+        <section class="welcome-section">
+            <h2>Welcome, {{ user.full_name }}!</h2>
+            <p>Here's your personal finance overview.</p>
+        </section>
+
+        <section class="card dashboard-placeholder">
+            <div class="dashboard-placeholder-icon">C</div>
+            <h2>Your financial dashboard</h2>
+            <p>
+                Your dashboard is being prepared.
+                Financial summaries and transaction management
+                will appear here.
+            </p>
+        </section>
+
+    </main>
+
+    <footer class="dashboard-footer">
+        © 2026 Cibeo
+    </footer>
+
+</div>
+
+{% endblock %}
+

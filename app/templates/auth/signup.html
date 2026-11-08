@@ -1,0 +1,138 @@
+
+{% extends "base.html" %}
+
+{% block title %}Create Account - Cibeo{% endblock %}
+
+{% block body %}
+
+<div class="auth-page">
+
+    <div class="auth-card">
+
+        <div class="auth-brand">
+            <div class="brand-icon">C</div>
+            <h1>Cibeo</h1>
+            <p>Personal Finance Management</p>
+        </div>
+
+        <div class="auth-heading">
+            <h2>Create an account</h2>
+            <p>Start managing your personal finances.</p>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger" data-auto-dismiss="5000">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        {% if success %}
+        <div class="alert alert-success" data-auto-dismiss="5000">
+            {{ success }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="/signup">
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token }}"
+            >
+
+            <div class="form-group">
+                <label class="form-label" for="full_name">
+                    Full Name
+                </label>
+
+                <input
+                    type="text"
+                    id="full_name"
+                    name="full_name"
+                    class="form-control"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    maxlength="150"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="username">
+                    Username
+                </label>
+
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    class="form-control"
+                    placeholder="Choose a username"
+                    autocomplete="username"
+                    minlength="3"
+                    maxlength="50"
+                    pattern="[a-zA-Z0-9_]+"
+                    title="Use only letters, numbers, and underscores."
+                    required
+                >
+
+                <small class="form-hint">
+                    Use 3–50 characters: letters, numbers, and underscores.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">
+                    Password
+                </label>
+
+                <div class="password-input-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Create a strong password"
+                        autocomplete="new-password"
+                        minlength="12"
+                        maxlength="128"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-toggle-password="password"
+                    >
+                        Show
+                    </button>
+                </div>
+
+                <small class="form-hint">
+                    Password must contain 12–128 characters.
+                </small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="auth-footer">
+            <p>
+                Already have an account?
+                <a href="/login">Sign in</a>
+            </p>
+        </div>
+
+    </div>
+
+    <div class="auth-copyright">
+        © 2026 Cibeo
+    </div>
+
+</div>
+
+{% endblock %}
+
