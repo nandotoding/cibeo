@@ -101,26 +101,12 @@ def login_page(request: Request):
     )
 
 @router.get("/signup")
-def signup_page(request: Request, response: Response):
-    token = generate_pre_auth_csrf_token()
-
-    response.set_cookie(
-        key=CSRF_COOKIE_NAME,
-        value=token,
-        max_age=PRE_AUTH_CSRF_MAX_AGE,
-        httponly=False,
-        secure=COOKIE_SECURE,
-        samesite="lax",
-        path="/",
-    )
-
-    return templates.TemplateResponse(
+def signup_page(request: Request):
+    return render_auth_page(
         request=request,
-        name="auth/signup.html",
-        context={
-            "csrf_token": token,
-        },
+        page="signup",
     )
+
 
 @router.get("/auth/csrf")
 def get_csrf_token(response: Response):

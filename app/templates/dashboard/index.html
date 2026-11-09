@@ -5,56 +5,105 @@
 
 {% block body %}
 
-<div class="dashboard-page">
+<div class="dashboard-layout">
 
-    <header class="dashboard-header">
-        <div class="dashboard-brand">
+    <aside class="sidebar">
+
+        <div class="sidebar-brand">
             <div class="brand-icon">C</div>
             <div>
                 <h1>Cibeo</h1>
-                <p>Personal Finance Management</p>
+                <p>Personal Finance</p>
             </div>
         </div>
 
-        <form method="POST" action="/logout">
-            <input
-                type="hidden"
-                name="csrf_token"
-                value="{{ csrf_token }}"
-            >
+        <nav class="sidebar-nav">
 
-            <button
-                type="submit"
-                class="btn btn-outline"
-                data-confirm="Are you sure you want to sign out?"
-            >
-                Sign Out
-            </button>
-        </form>
-    </header>
+            <p class="nav-section-title">WORKSPACE</p>
 
-    <main class="dashboard-content">
+            <a href="/dashboard" class="nav-link active">
+                <span class="nav-icon">▦</span>
+                <span>Dashboard</span>
+            </a>
 
-        <section class="welcome-section">
-            <h2>Welcome, {{ user.full_name }}!</h2>
-            <p>Here's your personal finance overview.</p>
-        </section>
+            <div class="nav-link disabled" aria-disabled="true">
+                <span class="nav-icon">▤</span>
+                <span>Manajemen</span>
+                <span class="nav-coming-soon">Soon</span>
+            </div>
 
-        <section class="card dashboard-placeholder">
-            <div class="dashboard-placeholder-icon">C</div>
-            <h2>Your financial dashboard</h2>
-            <p>
-                Your dashboard is being prepared.
-                Financial summaries and transaction management
-                will appear here.
-            </p>
-        </section>
+        </nav>
+
+        <div class="sidebar-user">
+
+            <div class="user-avatar">
+                {{ user.full_name[0] | upper }}
+            </div>
+
+            <div class="user-info">
+                <strong>{{ user.full_name }}</strong>
+                <span>@{{ user.username }}</span>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+        <header class="main-header">
+            <div>
+                <h2>Dashboard</h2>
+                <p>Welcome back, {{ user.full_name }}!</p>
+            </div>
+
+            <form method="POST" action="/logout">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button
+                    type="submit"
+                    class="btn btn-outline"
+                    data-confirm="Are you sure you want to sign out?"
+                >
+                    Sign Out
+                </button>
+            </form>
+        </header>
+
+        <div class="dashboard-content">
+
+            <section class="welcome-section">
+                <h2>Your financial overview</h2>
+                <p>
+                    Manage your personal finances
+                    and monitor your financial progress.
+                </p>
+            </section>
+
+            <section class="card dashboard-placeholder">
+
+                <div class="dashboard-placeholder-icon">C</div>
+
+                <h2>Your financial dashboard</h2>
+
+                <p>
+                    Financial summaries, transactions,
+                    and charts will appear here.
+                </p>
+
+            </section>
+
+        </div>
+
+        <footer class="dashboard-footer">
+            © 2026 Cibeo
+        </footer>
 
     </main>
-
-    <footer class="dashboard-footer">
-        © 2026 Cibeo
-    </footer>
 
 </div>
 
