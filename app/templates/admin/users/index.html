@@ -1,0 +1,94 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}User Management - Admin Panel{% endblock %}
+
+{% block page_heading %}User Management{% endblock %}
+
+{% block page_description %}
+View and manage registered Cibeo user accounts.
+{% endblock %}
+
+{% block admin_content %}
+
+<section class="card user-management-card">
+
+    <div class="section-header">
+        <div>
+            <h3>Registered Users</h3>
+            <p>Manage active and inactive user accounts.</p>
+        </div>
+
+        <span class="user-count">
+            {{ users | length }} users
+        </span>
+    </div>
+
+    {% if users %}
+
+    <div class="table-responsive">
+        <table class="data-table">
+
+            <thead>
+                <tr>
+                    <th>Full Name</th>
+                    <th>Username</th>
+                    <th>Account Status</th>
+                    <th>Registered</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for user in users %}
+                <tr>
+
+                    <td>
+                        <strong>{{ user.full_name }}</strong>
+                    </td>
+
+                    <td>@{{ user.username }}</td>
+
+                    <td>
+                        {% if user.is_active %}
+                            <span class="status-badge status-active">
+                                Active
+                            </span>
+                        {% else %}
+                            <span class="status-badge status-inactive">
+                                Inactive
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {{ user.created_at.strftime("%d %b %Y") }}
+                    </td>
+
+                    <td>
+                        <a
+                            href="/admin/users/{{ user.id }}"
+                            class="btn btn-secondary btn-sm"
+                        >
+                            View Details
+                        </a>
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+    {% else %}
+
+    <div class="empty-state">
+        <h3>No Users Found</h3>
+        <p>There are currently no registered user accounts.</p>
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

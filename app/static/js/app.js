@@ -58,6 +58,119 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+
+    // 5. Theme toggle
+    const themeToggleButtons = document.querySelectorAll("[data-theme-toggle]");
+
+    function updateThemeToggle(theme) {
+        const isDark = theme === "dark";
+
+        themeToggleButtons.forEach((button) => {
+            const icon = button.querySelector("[data-theme-icon]");
+            const label = button.querySelector("[data-theme-label]");
+
+            const nextThemeLabel = isDark ? "Light Mode" : "Dark Mode";
+
+            if (icon) {
+                icon.textContent = isDark ? "☀" : "☾";
+            }
+
+            if (label) {
+                label.textContent = nextThemeLabel;
+            }
+
+            button.setAttribute(
+                "aria-label",
+                `Switch to ${nextThemeLabel}`
+            );
+
+            button.setAttribute(
+                "title",
+                `Switch to ${nextThemeLabel}`
+            );
+        });
+    }
+
+        // 6. Mobile sidebar toggle
+    const sidebar = document.getElementById("sidebar");
+    const sidebarToggle = document.querySelector("[data-sidebar-toggle]");
+    const sidebarBackdrop = document.querySelector("[data-sidebar-backdrop]");
+
+    if (sidebar && sidebarToggle && sidebarBackdrop) {
+        function closeSidebar() {
+            sidebar.classList.remove("is-open");
+            sidebarBackdrop.classList.remove("is-visible");
+            sidebarToggle.setAttribute("aria-expanded", "false");
+            document.body.style.overflow = "";
+        }
+
+        function openSidebar() {
+            sidebar.classList.add("is-open");
+            sidebarBackdrop.classList.add("is-visible");
+            sidebarToggle.setAttribute("aria-expanded", "true");
+            document.body.style.overflow = "hidden";
+        }
+
+        sidebarToggle.addEventListener("click", () => {
+            const isOpen = sidebar.classList.contains("is-open");
+
+            if (isOpen) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        sidebarBackdrop.addEventListener("click", closeSidebar);
+
+        sidebar.querySelectorAll(".nav-link").forEach((link) => {
+            link.addEventListener("click", closeSidebar);
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                closeSidebar();
+            }
+        });
+
+        window.addEventListener("resize", () => {
+            if (window.innerWidth > 600) {
+                closeSidebar();
+            }
+        });
+    }
+
+    function applyTheme(theme) {
+        const selectedTheme = theme === "light" ? "light" : "dark";
+
+        document.documentElement.dataset.theme = selectedTheme;
+
+        try {
+            localStorage.setItem("cibeo-theme", selectedTheme);
+        } catch (error) {
+            console.warn("Unable to save theme preference.");
+        }
+
+        updateThemeToggle(selectedTheme);
+
+        if (typeof window.CibeoUpdateChartTheme === "function") {
+            window.CibeoUpdateChartTheme();
+        }
+    }
+
+    updateThemeToggle(
+        document.documentElement.dataset.theme || "dark"
+    );
+
+    themeToggleButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            const currentTheme = document.documentElement.dataset.theme;
+            const nextTheme = currentTheme === "dark" ? "light" : "dark";
+
+            applyTheme(nextTheme);
+        });
+    });
+
 });
 
 

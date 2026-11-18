@@ -1,4 +1,3 @@
-
 {% extends "base.html" %}
 
 {% block title %}Dashboard - Cibeo{% endblock %}
@@ -7,12 +6,39 @@
 
 <div class="dashboard-layout">
 
-    <aside class="sidebar">
+    <div class="mobile-topbar">
+        <div class="mobile-brand">
+            <div class="brand-icon">C</div>
+            <strong class="brand-wordmark">cibeo</strong>
+        </div>
+
+        <button
+            type="button"
+            class="mobile-menu-toggle"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="sidebar"
+            data-sidebar-toggle
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <button
+        type="button"
+        class="sidebar-backdrop"
+        aria-label="Close navigation menu"
+        data-sidebar-backdrop
+    ></button>
+
+    <aside class="sidebar" id="sidebar">
 
         <div class="sidebar-brand">
             <div class="brand-icon">C</div>
             <div>
-                <h1>Cibeo</h1>
+                <h1 class="brand-wordmark">cibeo</h1>
                 <p>Personal Finance</p>
             </div>
         </div>
@@ -22,28 +48,85 @@
             <p class="nav-section-title">WORKSPACE</p>
 
             <a href="/dashboard" class="nav-link active">
-                <span class="nav-icon">▦</span>
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="9" rx="1"/>
+                        <rect x="14" y="3" width="7" height="5" rx="1"/>
+                        <rect x="14" y="12" width="7" height="9" rx="1"/>
+                        <rect x="3" y="16" width="7" height="5" rx="1"/>
+                    </svg>
+                </span>
                 <span>Dashboard</span>
             </a>
 
-            <div class="nav-link disabled" aria-disabled="true">
-                <span class="nav-icon">▤</span>
-                <span>Manajemen</span>
-                <span class="nav-coming-soon">Soon</span>
-            </div>
+            <a href="/management" class="nav-link">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <rect x="2" y="5" width="20" height="15" rx="2"/>
+                        <path d="M2 10h20"/>
+                        <path d="M16 15h2"/>
+                        <path d="M6 5V3h12v2"/>
+                    </svg>
+                </span>
+                <span>Management</span>
+            </a>
 
         </nav>
 
         <div class="sidebar-user">
 
-            <div class="user-avatar">
-                {{ user.full_name[0] | upper }}
-            </div>
+            <a href="/profile" class="sidebar-profile-link"
+            aria-label="View Profile">
 
-            <div class="user-info">
-                <strong>{{ user.full_name }}</strong>
-                <span>@{{ user.username }}</span>
-            </div>
+                <div class="user-avatar">
+                    {{ user.full_name[0] | upper }}
+                </div>
+
+                <div class="user-info">
+                    <strong>{{ user.full_name }}</strong>
+                    <span>@{{ user.username }}</span>
+                </div>
+
+            </a>
+
+            <form method="POST" action="/logout" class="sidebar-signout-form">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button
+                    type="submit"
+                    class="sidebar-signout-button"
+                    aria-label="Sign Out"
+                    title="Sign Out"
+                    data-confirm="Are you sure you want to sign out?"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </form>
 
         </div>
 
@@ -56,44 +139,307 @@
                 <h2>Dashboard</h2>
                 <p>Welcome back, {{ user.full_name }}!</p>
             </div>
-
-            <form method="POST" action="/logout">
-                <input
-                    type="hidden"
-                    name="csrf_token"
-                    value="{{ csrf_token }}"
-                >
-
-                <button
-                    type="submit"
-                    class="btn btn-outline"
-                    data-confirm="Are you sure you want to sign out?"
-                >
-                    Sign Out
-                </button>
-            </form>
         </header>
 
         <div class="dashboard-content">
 
             <section class="welcome-section">
-                <h2>Your financial overview</h2>
+                <h2>Financial Overview</h2>
                 <p>
-                    Manage your personal finances
-                    and monitor your financial progress.
+                    Monitor your income, expenses,
+                    and financial position.
                 </p>
             </section>
 
-            <section class="card dashboard-placeholder">
+            <!-- Month Selector -->
+            <section class="dashboard-month-selector">
 
-                <div class="dashboard-placeholder-icon">C</div>
+                <span class="month-selector-title">
+                    Reporting Period
+                </span>
 
-                <h2>Your financial dashboard</h2>
+                <form method="GET" action="/dashboard" id="month-selector-form">
 
-                <p>
-                    Financial summaries, transactions,
-                    and charts will appear here.
-                </p>
+                    <input
+                        type="hidden"
+                        name="month"
+                        id="selected-month"
+                    >
+
+                    <div class="month-selector-fields">
+
+                        <div class="month-selector-field">
+                            <label for="dashboard-month">Month</label>
+
+                            <select id="dashboard-month" required>
+                                {% set months = [
+                                    'January', 'February', 'March',
+                                    'April', 'May', 'June',
+                                    'July', 'August', 'September',
+                                    'October', 'November', 'December'
+                                ] %}
+
+                                {% for month_name in months %}
+                                    <option
+                                        value="{{ '%02d'|format(loop.index) }}"
+                                        {% if loop.index == selected_month.month %}selected{% endif %}
+                                    >
+                                        {{ month_name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="month-selector-field">
+                            <label for="dashboard-year">Year</label>
+
+                            <select id="dashboard-year" required>
+                                {% for year in range(current_month.year - 10, current_month.year + 6) %}
+                                    <option
+                                        value="{{ year }}"
+                                        {% if year == selected_month.year %}selected{% endif %}
+                                    >
+                                        {{ year }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            Apply
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+            <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const monthForm = document.getElementById("month-selector-form");
+                const monthSelect = document.getElementById("dashboard-month");
+                const yearSelect = document.getElementById("dashboard-year");
+                const selectedMonth = document.getElementById("selected-month");
+
+                monthForm.addEventListener("submit", function () {
+                    selectedMonth.value =
+                        `${yearSelect.value}-${monthSelect.value}`;
+                });
+            });
+            </script>
+
+            <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const monthSelect = document.getElementById("dashboard-month");
+                const yearSelect = document.getElementById("dashboard-year");
+
+                const selectedMonth = "{{ '%02d'|format(selected_month.month) }}";
+
+                monthSelect.addEventListener("change", function () {
+                    monthSelect.dataset.selectedMonth = monthSelect.value.split("-")[1];
+                });
+
+                yearSelect.addEventListener("change", function () {
+                    const month = monthSelect.dataset.selectedMonth || selectedMonth;
+
+                    monthSelect.value = `${yearSelect.value}-${month}`;
+                });
+
+                monthSelect.dataset.selectedMonth = selectedMonth;
+            });
+            </script>
+              
+            <!-- Expense Limit -->
+            <section class="dashboard-stat-section">
+
+                <h3>Expense Limit</h3>
+
+                <div class="dashboard-summary-grid dashboard-expense-limit-grid">
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Expense Limit</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(total_standard).replace(",", ".") }}
+                        </h3>
+                        <span>Applicable Monthly Expense Limit</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Financial Balances -->
+            <section class="dashboard-stat-section">
+
+                <h3>Financial Balances</h3>
+
+                <div class="dashboard-summary-grid dashboard-balance-grid">
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Surplus / Deficit</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(surplus_deficit).replace(",", ".") }}
+                        </h3>
+                        <span>Total income minus total expenses</span>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Fixed Income Balance</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(fixed_income_balance).replace(",", ".") }}
+                        </h3>
+                        <span>Fixed income minus fixed expenses</span>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Remaining Fixed Income</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(remaining_fixed_income).replace(",", ".") }}
+                        </h3>
+                        <span>Fixed income minus total expenses</span>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Income and Expenses -->
+            <section class="dashboard-stat-section">
+
+                <h3>Income and Expenses</h3>
+
+                <div class="dashboard-summary-grid dashboard-income-grid">
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Total Income</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(total_income).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Total Expenses</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(total_expenses).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Fixed Income</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(fixed_income).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Fixed Expenses</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(fixed_expenses).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Additional Income</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(additional_income).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">Additional Expenses</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(additional_expenses).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">All-Time Income</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(all_time_income).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                    <div class="card dashboard-summary-card">
+                        <p class="summary-label">All-Time Expenses</p>
+                        <h3>
+                            Rp {{ "{:,.0f}".format(all_time_expenses).replace(",", ".") }}
+                        </h3>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <!-- Dashboard Charts -->
+            <section class="dashboard-chart-section">
+                
+                <div class="dashboard-chart-grid">
+
+                    <!-- Main Expense Breakdown -->
+                    <div class="card dashboard-chart-card dashboard-main-chart">
+
+                        <h4>Expense Breakdown</h4>
+
+                        <div class="dashboard-donut-container">
+                            <canvas id="expense-breakdown-chart"></canvas>
+                        </div>
+
+                        {% if remaining_fixed_income < 0 %}
+                        <p class="chart-note chart-deficit">
+                            Remaining Fixed Income Deficit:
+                            Rp {{ "{:,.0f}".format(remaining_fixed_income | abs).replace(",", ".") }}
+                        </p>
+                        {% endif %}
+
+                        <p class="chart-note" id="expense-breakdown-empty" hidden>
+                            No financial data available for this month.
+                        </p>
+
+                    </div>
+
+                    <!-- Expense Limit vs Total Expenses -->
+                    <div class="card dashboard-chart-card">
+
+                        <h4>Expense Limit vs Total Expenses</h4>
+
+                        <div class="dashboard-donut-container">
+                            <canvas id="expense-limit-total-chart"></canvas>
+                        </div>
+
+                        <p class="chart-note" id="expense-limit-total-note"></p>
+
+                    </div>
+
+                    <!-- Expense Limit vs Fixed Expenses -->
+                    <div class="card dashboard-chart-card">
+
+                        <h4>Expense Limit vs Fixed Expenses</h4>
+
+                        <div class="dashboard-donut-container">
+                            <canvas id="expense-limit-fixed-chart"></canvas>
+                        </div>
+
+                        <p class="chart-note" id="expense-limit-fixed-note"></p>
+
+                    </div>
+
+                    <!-- Expense Breakdown Bar Chart -->
+                    <div class="card dashboard-chart-card dashboard-bar-chart">
+
+                        <h4>Expense Breakdown</h4>
+
+                        <div class="dashboard-bar-container">
+                            <canvas id="expense-breakdown-bar-chart"></canvas>
+                        </div>
+
+                        <p class="chart-note" id="expense-breakdown-bar-empty" hidden>
+                            No expenses recorded for this month.
+                        </p>
+
+                    </div>
+
+                </div>
 
             </section>
 
@@ -109,3 +455,435 @@
 
 {% endblock %}
 
+
+
+{% block scripts %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const expenseBreakdown = {{ expense_breakdown | tojson }};
+    const remainingFixedIncome = {{ remaining_fixed_income | tojson }};
+    const additionalIncome = {{ additional_income | tojson }};
+    const expenseLimit = {{ total_standard | tojson }};
+    const totalExpenses = {{ total_expenses | tojson }};
+    const fixedExpenses = {{ fixed_expenses | tojson }};
+
+    const formatRupiah = (value) => {
+        return new Intl.NumberFormat("id-ID", {
+            style: "currency",
+            currency: "IDR",
+            maximumFractionDigits: 0
+        }).format(value);
+    };
+
+    const chartColors = {
+        remaining: "#3b82f6",
+        additional: "#a78bfa",
+        expenses: [
+            "#f59e0b",
+            "#ef4444",
+            "#10b981",
+            "#06b6d4",
+            "#8b5cf6",
+            "#ec4899",
+            "#64748b",
+            "#84cc16"
+        ],
+        used: "#3b82f6",
+        unused: "#e5e7eb"
+    };
+
+    Chart.register(ChartDataLabels);
+
+        // Theme-aware chart colors
+    function getChartThemeColors() {
+        const isDark =
+            document.documentElement.dataset.theme === "dark";
+
+        return {
+            text: isDark ? "#e5e7eb" : "#253445",
+            muted: isDark ? "#9ca3af" : "#718096",
+            grid: isDark ? "#374151" : "#e2e8f0",
+            border: isDark ? "#374151" : "#ffffff",
+            tooltipBackground: isDark ? "#1f2937" : "#ffffff",
+            tooltipBorder: isDark ? "#374151" : "#e2e8f0"
+        };
+    }
+
+    const getPercentage = (value, total) => {
+        return total > 0 ? (value / total) * 100 : 0;
+    };
+
+        // Update chart colors when theme changes
+    function updateChartTheme() {
+        const colors = getChartThemeColors();
+
+        Chart.instances && Object.values(Chart.instances).forEach((chart) => {
+            if (!chart) return;
+
+            if (chart.config.type === "doughnut") {
+                chart.options.plugins.legend.labels.color = colors.text;
+            }
+
+            if (chart.options.plugins.tooltip) {
+                chart.options.plugins.tooltip.backgroundColor =
+                    colors.tooltipBackground;
+                chart.options.plugins.tooltip.titleColor = colors.text;
+                chart.options.plugins.tooltip.bodyColor = colors.text;
+                chart.options.plugins.tooltip.borderColor =
+                    colors.tooltipBorder;
+            }
+
+            if (chart.options.scales) {
+                Object.values(chart.options.scales).forEach((scale) => {
+                    if (scale.ticks) {
+                        scale.ticks.color =
+                            scale.axis === "x" ? colors.muted : colors.text;
+                    }
+
+                    if (scale.grid) {
+                        scale.grid.color = colors.grid;
+                    }
+
+                    if (scale.border) {
+                        scale.border.color = colors.border;
+                    }
+                });
+            }
+
+            chart.update("none");
+        });
+    }
+
+    window.CibeoUpdateChartTheme = updateChartTheme;
+
+    
+    const commonDoughnutOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: "65%",
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: {
+                    color: getChartThemeColors().text,
+                    usePointStyle: true,
+                    pointStyle: "circle",
+                    padding: 16
+                }
+            },
+
+            tooltip: {
+                backgroundColor: getChartThemeColors().tooltipBackground,
+                titleColor: getChartThemeColors().text,
+                bodyColor: getChartThemeColors().text,
+                borderColor: getChartThemeColors().tooltipBorder,
+                borderWidth: 1,
+                callbacks: {
+                    label: function (context) {
+                        const values = context.dataset.data;
+                        const total = values.reduce(
+                            (sum, value) => sum + value,
+                            0
+                        );
+
+                        const value = context.raw;
+                        const percentage = getPercentage(value, total);
+
+                        return ` ${formatRupiah(value)} (${percentage.toFixed(1)}%)`;
+                    }
+                }
+            },
+
+            datalabels: {
+                color: "#ffffff",
+                formatter: function (value, context) {
+                    const values = context.dataset.data;
+                    const total = values.reduce(
+                        (sum, item) => sum + item,
+                        0
+                    );
+
+                    const percentage = getPercentage(value, total);
+
+                    return percentage >= 5
+                        ? `${percentage.toFixed(1)}%`
+                        : "";
+                },
+                font: {
+                    weight: "bold",
+                    size: 11
+                }
+            }
+        }
+    };
+
+
+    // Main Expense Breakdown
+    const breakdownLabels = [];
+    const breakdownValues = [];
+    const breakdownColors = [];
+
+    if (remainingFixedIncome > 0) {
+        breakdownLabels.push("Remaining Fixed Income");
+        breakdownValues.push(remainingFixedIncome);
+        breakdownColors.push(chartColors.remaining);
+    }
+
+    if (additionalIncome > 0) {
+        breakdownLabels.push("Additional Income");
+        breakdownValues.push(additionalIncome);
+        breakdownColors.push(chartColors.additional);
+    }
+
+    expenseBreakdown.forEach((item, index) => {
+        if (item.amount > 0) {
+            breakdownLabels.push(item.description);
+            breakdownValues.push(item.amount);
+            breakdownColors.push(
+                chartColors.expenses[index % chartColors.expenses.length]
+            );
+        }
+    });
+
+    const breakdownCanvas = document.getElementById(
+        "expense-breakdown-chart"
+    );
+
+    if (breakdownValues.length > 0) {
+        new Chart(breakdownCanvas, {
+            type: "doughnut",
+            data: {
+                labels: breakdownLabels,
+                datasets: [{
+                    data: breakdownValues,
+                    backgroundColor: breakdownColors,
+                    borderWidth: 2,
+                    borderColor: "#ffffff"
+                }]
+            },
+            options: commonDoughnutOptions
+        });
+    } else {
+        breakdownCanvas.hidden = true;
+        document.getElementById(
+            "expense-breakdown-empty"
+        ).hidden = false;
+    }
+
+    // Expense Limit Comparison
+    function createLimitChart(canvasId, noteId, expenses, label) {
+
+        const canvas = document.getElementById(canvasId);
+        const note = document.getElementById(noteId);
+
+        if (!canvas || !note) {
+            console.warn("Chart element not found:", canvasId, noteId);
+            return;
+        }
+
+        if (expenseLimit <= 0) {
+            canvas.hidden = true;
+            note.textContent = "No Expense Limit available for this month.";
+            return;
+        }
+
+        const percentage = (expenses / expenseLimit) * 100;
+        const isOverLimit = expenses > expenseLimit;
+        const isAtLimit = expenses === expenseLimit;
+
+        let chartLabels;
+        let chartData;
+        let backgroundColors;
+
+        if (isOverLimit) {
+            const exceededAmount = expenses - expenseLimit;
+
+            chartLabels = [
+                "Expense Limit",
+                "Exceeded Amount"
+            ];
+
+            chartData = [
+                expenseLimit,
+                exceededAmount
+            ];
+
+            backgroundColors = [
+                chartColors.used,
+                "#dc5252"
+            ];
+
+            note.textContent =
+                `OVER LIMIT · ${percentage.toFixed(1)}% used · Exceeded by ${formatRupiah(exceededAmount)}.`;
+
+        } else {
+            const remainingAmount = expenseLimit - expenses;
+
+            chartLabels = [
+                label,
+                "Remaining Expense Limit"
+            ];
+
+            chartData = [
+                expenses,
+                remainingAmount
+            ];
+
+            backgroundColors = [
+                chartColors.used,
+                chartColors.unused
+            ];
+
+            if (isAtLimit) {
+                note.textContent = "AT LIMIT · 100% used.";
+            } else if (expenses === 0) {
+                note.textContent = "No expenses recorded.";
+            } else {
+                note.textContent =
+                    `WITHIN LIMIT · ${percentage.toFixed(1)}% used · ${formatRupiah(remainingAmount)} remaining.`;
+            }
+        }
+
+        new Chart(canvas, {
+            type: "doughnut",
+            data: {
+                labels: chartLabels,
+                datasets: [{
+                    data: chartData,
+                    backgroundColor: backgroundColors,
+                    borderWidth: 2,
+                    borderColor: "#ffffff"
+                }]
+            },
+            options: commonDoughnutOptions
+        });
+    }
+
+    createLimitChart(
+        "expense-limit-total-chart",
+        "expense-limit-total-note",
+        totalExpenses,
+        "Total Expenses"
+    );
+
+    createLimitChart(
+        "expense-limit-fixed-chart",
+        "expense-limit-fixed-note",
+        fixedExpenses,
+        "Fixed Expenses"
+    );
+
+    // Horizontal Expense Breakdown
+    const barCanvas = document.getElementById(
+        "expense-breakdown-bar-chart"
+    );
+
+    if (expenseBreakdown.length > 0) {
+        new Chart(barCanvas, {
+            type: "bar",
+            data: {
+                labels: expenseBreakdown.map(
+                    item => item.description
+                ),
+                datasets: [{
+                    label: "Expenses",
+                    data: expenseBreakdown.map(
+                        item => item.amount
+                    ),
+                    backgroundColor: "#3b82f6",
+                    borderRadius: 5,
+                    barThickness: 22
+                }]
+            },
+            
+            options: {
+                indexAxis: "y",
+                responsive: true,
+                maintainAspectRatio: false,
+
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+                        backgroundColor: getChartThemeColors().tooltipBackground,
+                        titleColor: getChartThemeColors().text,
+                        bodyColor: getChartThemeColors().text,
+                        borderColor: getChartThemeColors().tooltipBorder,
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function (context) {
+                                return formatRupiah(context.raw);
+                            }
+                        }
+                    },
+                    datalabels: {
+                        display: true,
+                        color: "#ffffff",
+                        anchor: "center",
+                        align: "center",
+                        formatter: function (value) {
+                            return formatRupiah(value);
+                        },
+                        font: {
+                            weight: "bold",
+                            size: 11
+                        }
+                    }
+                },
+
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: {
+                            color: getChartThemeColors().grid
+                        },
+                        border: {
+                            color: getChartThemeColors().border
+                        },
+                        ticks: {
+                            color: getChartThemeColors().muted,
+                            callback: function (value) {
+                                return new Intl.NumberFormat(
+                                    "id-ID",
+                                    {
+                                        notation: "compact",
+                                        maximumFractionDigits: 1
+                                    }
+                                ).format(value);
+                            }
+                        }
+                    },
+
+                    y: {
+                        grid: {
+                            display: false
+                        },
+                        border: {
+                            color: getChartThemeColors().border
+                        },
+                        ticks: {
+                            color: getChartThemeColors().text
+                        }
+                    }
+                }
+            }
+
+        });
+    } else {
+        barCanvas.hidden = true;
+        document.getElementById(
+            "expense-breakdown-bar-empty"
+        ).hidden = false;
+    }
+
+});
+</script>
+
+{% endblock %}

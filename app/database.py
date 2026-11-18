@@ -21,10 +21,12 @@ def prepare_database_url(url: str) -> str:
 
     return url
 
-
 engine = create_engine(
     prepare_database_url(DATABASE_URL),
     pool_pre_ping=True,
+    pool_size=1,
+    max_overflow=0,
+    pool_recycle=300,
 )
 
 SessionLocal = sessionmaker(

@@ -1,0 +1,1119 @@
+
+{% extends "base.html" %}
+
+{% block title %}Management - Cibeo{% endblock %}
+
+{% block body %}
+
+<div class="dashboard-layout">
+
+    <div class="mobile-topbar">
+        <div class="mobile-brand">
+            <div class="brand-icon">C</div>
+            <strong class="brand-wordmark">cibeo</strong>
+        </div>
+
+        <button
+            type="button"
+            class="mobile-menu-toggle"
+            aria-label="Open navigation menu"
+            aria-expanded="false"
+            aria-controls="sidebar"
+            data-sidebar-toggle
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </div>
+
+    <button
+        type="button"
+        class="sidebar-backdrop"
+        aria-label="Close navigation menu"
+        data-sidebar-backdrop
+    ></button>
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="brand-icon">C</div>
+            <div>
+                <h1 class="brand-wordmark">cibeo</h1>
+                <p>Personal Finance</p>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <p class="nav-section-title">WORKSPACE</p>
+
+            <a href="/dashboard" class="nav-link">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <rect x="3" y="3" width="7" height="9" rx="1"/>
+                        <rect x="14" y="3" width="7" height="5" rx="1"/>
+                        <rect x="14" y="12" width="7" height="9" rx="1"/>
+                        <rect x="3" y="16" width="7" height="5" rx="1"/>
+                    </svg>
+                </span>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="/management" class="nav-link active">
+                <span class="nav-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                        aria-hidden="true">
+                        <rect x="2" y="5" width="20" height="15" rx="2"/>
+                        <path d="M2 10h20"/>
+                        <path d="M16 15h2"/>
+                        <path d="M6 5V3h12v2"/>
+                    </svg>
+                </span>
+                <span>Management</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-user">
+
+            <a href="/profile" class="sidebar-profile-link"
+            aria-label="View Profile">
+
+                <div class="user-avatar">
+                    {{ user.full_name[0] | upper }}
+                </div>
+
+                <div class="user-info">
+                    <strong>{{ user.full_name }}</strong>
+                    <span>@{{ user.username }}</span>
+                </div>
+
+            </a>
+
+            <form method="POST" action="/logout" class="sidebar-signout-form">
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button
+                    type="submit"
+                    class="sidebar-signout-button"
+                    aria-label="Sign Out"
+                    title="Sign Out"
+                    data-confirm="Are you sure you want to sign out?"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        aria-hidden="true"
+                    >
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                        <polyline points="16 17 21 12 16 7"/>
+                        <line x1="21" y1="12" x2="9" y2="12"/>
+                    </svg>
+                </button>
+            </form>
+
+        </div>
+
+    </aside>
+
+    <main class="dashboard-main">
+
+        <header class="main-header">
+            <div>
+                <h2>Management</h2>
+                <p>Manage your income, expenses, and expense limits.</p>
+            </div>
+
+        </header>
+
+        <div class="dashboard-content management-content">
+
+            <section class="welcome-section">
+                <h2>Financial Management</h2>
+                <p>
+                    Review your monthly expense limit,
+                    income, and expenses.
+                </p>
+            </section>
+
+            <!-- Current month expense limit -->
+
+            <section class="card">
+
+                <div class="management-section-header">
+                    <div>
+                        <h2>Monthly Expense Limit</h2>
+                        <p>
+                            {{ current_month.strftime("%B %Y") }}
+                        </p>
+                    </div>
+
+                    <a
+                        href="/management/standards"
+                        class="btn btn-outline"
+                    >
+                        Manage Expense Limit
+                    </a>
+                </div>
+
+                <div class="management-total">
+                    <span>Total Monthly Expense Limit</span>
+
+                    <strong>
+                        Rp {{ "{:,.0f}".format(total_standard).replace(",", ".") }}
+                    </strong>
+                </div>
+
+            </section>
+
+            <!-- Current month income -->
+
+            <section class="card">
+
+<div class="management-section-header">
+    <div>
+        <h2>Monthly Income</h2>
+        <p>
+            {{ current_month.strftime("%B %Y") }}
+        </p>
+    </div>
+
+    <button
+        type="button"
+        class="btn btn-primary"
+        id="open-income-modal"
+    >
+        Add Income
+    </button>
+</div>
+
+                {% if incomes %}
+
+                    <div class="management-table-wrapper">
+
+                        <table class="management-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th class="amount-column">Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for transaction in incomes %}
+
+                                    <tr>
+                                        <td>{{ transaction.description }}</td>
+
+                                        <td>
+                                            {% if transaction.category == "fixed" %}
+                                                <span class="category-badge fixed">
+                                                    Fixed
+                                                </span>
+                                            {% else %}
+                                                <span class="category-badge additional">
+                                                    Additional
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="amount-column">
+                                            Rp {{ "{:,.0f}".format(transaction.amount).replace(",", ".") }}
+                                        </td>
+                                        <td>
+                                            <div class="table-actions">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline"
+                                                    data-edit-income
+                                                    data-id="{{ transaction.id }}"
+                                                    data-description="{{ transaction.description }}"
+                                                    data-category="{{ transaction.category }}"
+                                                    data-amount="{{ transaction.amount }}"
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <form
+                                                    method="POST"
+                                                    action="/management/income/{{ transaction.id }}/delete"
+                                                    onsubmit="return confirm('Delete this income transaction?');"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="csrf_token"
+                                                        value="{{ csrf_token }}"
+                                                    >
+
+                                                    <button type="submit" class="btn btn-outline">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="management-empty">
+                        <h3>No Income Transactions</h3>
+                        <p>
+                            No income transactions have been recorded
+                            for this month.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- Add income modal -->
+
+            <div
+                class="standard-modal-overlay"
+                id="income-modal"
+                hidden
+            >
+                <div
+                    class="standard-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="income-modal-title"
+                >
+
+                    <div class="standard-modal-header">
+                        <div>
+                            <h2 id="income-modal-title">Add Income</h2>
+                            <p>
+                                Record a new income transaction for
+                                {{ current_month.strftime("%B %Y") }}.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="standard-modal-close"
+                            id="close-income-modal"
+                            aria-label="Close"
+                        >
+                            &times;
+                        </button>
+                    </div>
+
+                    <form method="POST" action="/management/income" id="income-form">
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token }}"
+                        >
+
+                        <div class="standard-field">
+                            <label for="income-description">
+                                Description
+                            </label>
+
+                            <input
+                                type="text"
+                                id="income-description"
+                                name="description"
+                                maxlength="200"
+                                placeholder="e.g. Monthly salary"
+                                required
+                            >
+                        </div>
+
+                        <div class="standard-field">
+                            <label for="income-category">
+                                Category
+                            </label>
+
+                            <select
+                                id="income-category"
+                                name="category"
+                                required
+                            >
+                                <option value="fixed">Fixed</option>
+                                <option value="additional">Additional</option>
+                            </select>
+                        </div>
+
+                        <div class="standard-field">
+                            <label for="income-amount">
+                                Amount (Rp)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="income-amount"
+                                name="amount"
+                                min="1"
+                                step="1"
+                                placeholder="e.g. 5000000"
+                                required
+                            >
+                        </div>
+
+                        <div class="standard-modal-actions">
+
+                            <button
+                                type="button"
+                                class="btn btn-outline"
+                                id="cancel-income-modal"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                                data-confirm="Save this income transaction?"
+                            >
+                                Save Income
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+
+            <!-- Edit income modal -->
+
+            <div
+                class="standard-modal-overlay"
+                id="edit-income-modal"
+                hidden
+            >
+                <div
+                    class="standard-modal"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="edit-income-modal-title"
+                >
+
+                    <div class="standard-modal-header">
+                        <div>
+                            <h2 id="edit-income-modal-title">Edit Income</h2>
+                            <p>
+                                Update the selected income transaction.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="standard-modal-close"
+                            id="close-edit-income-modal"
+                            aria-label="Close"
+                        >
+                            &times;
+                        </button>
+                    </div>
+
+                    <form
+                        method="POST"
+                        id="edit-income-form"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="{{ csrf_token }}"
+                        >
+
+                        <div class="standard-field">
+                            <label for="edit-income-description">
+                                Description
+                            </label>
+
+                            <input
+                                type="text"
+                                id="edit-income-description"
+                                name="description"
+                                maxlength="200"
+                                required
+                            >
+                        </div>
+
+                        <div class="standard-field">
+                            <label for="edit-income-category">
+                                Category
+                            </label>
+
+                            <select
+                                id="edit-income-category"
+                                name="category"
+                                required
+                            >
+                                <option value="fixed">Fixed</option>
+                                <option value="additional">Additional</option>
+                            </select>
+                        </div>
+
+                        <div class="standard-field">
+                            <label for="edit-income-amount">
+                                Amount (Rp)
+                            </label>
+
+                            <input
+                                type="number"
+                                id="edit-income-amount"
+                                name="amount"
+                                min="1"
+                                step="1"
+                                required
+                            >
+                        </div>
+
+                        <div class="standard-modal-actions">
+
+                            <button
+                                type="button"
+                                class="btn btn-outline"
+                                id="cancel-edit-income-modal"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                class="btn btn-primary"
+                            >
+                                Save Changes
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+<!-- Edit expense modal -->
+
+<div
+    class="standard-modal-overlay"
+    id="edit-expense-modal"
+    hidden
+>
+    <div
+        class="standard-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-expense-modal-title"
+    >
+
+        <div class="standard-modal-header">
+            <div>
+                <h2 id="edit-expense-modal-title">Edit Expense</h2>
+                <p>
+                    Update the selected expense transaction.
+                </p>
+            </div>
+
+            <button
+                type="button"
+                class="standard-modal-close"
+                id="close-edit-expense-modal"
+                aria-label="Close"
+            >
+                &times;
+            </button>
+        </div>
+
+        <form
+            method="POST"
+            id="edit-expense-form"
+        >
+
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token }}"
+            >
+
+            <div class="standard-field">
+                <label for="edit-expense-description">
+                    Description
+                </label>
+
+                <input
+                    type="text"
+                    id="edit-expense-description"
+                    name="description"
+                    maxlength="200"
+                    required
+                >
+            </div>
+
+            <div class="standard-field">
+                <label for="edit-expense-category">
+                    Category
+                </label>
+
+                <select
+                    id="edit-expense-category"
+                    name="category"
+                    required
+                >
+                    <option value="fixed">Fixed</option>
+                    <option value="additional">Additional</option>
+                </select>
+            </div>
+
+            <div class="standard-field">
+                <label for="edit-expense-amount">
+                    Amount (Rp)
+                </label>
+
+                <input
+                    type="number"
+                    id="edit-expense-amount"
+                    name="amount"
+                    min="1"
+                    step="1"
+                    required
+                >
+            </div>
+
+            <div class="standard-modal-actions">
+
+                <button
+                    type="button"
+                    class="btn btn-outline"
+                    id="cancel-edit-expense-modal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn btn-primary"
+                >
+                    Save Changes
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+
+            <!-- Current month expenses -->
+
+            <section class="card">
+
+<div class="management-section-header">
+    <div>
+        <h2>Monthly Expenses</h2>
+        <p>
+            {{ current_month.strftime("%B %Y") }}
+        </p>
+    </div>
+
+    <button
+        type="button"
+        class="btn btn-primary"
+        id="open-expense-modal"
+    >
+        Add Expense
+    </button>
+</div>
+
+                {% if expenses %}
+
+                    <div class="management-table-wrapper">
+
+                        <table class="management-table">
+
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th class="amount-column">Amount</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for transaction in expenses %}
+
+                                    <tr>
+                                        <td>{{ transaction.description }}</td>
+
+                                        <td>
+                                            {% if transaction.category == "fixed" %}
+                                                <span class="category-badge fixed">
+                                                    Fixed
+                                                </span>
+                                            {% else %}
+                                                <span class="category-badge additional">
+                                                    Additional
+                                                </span>
+                                            {% endif %}
+                                        </td>
+
+                                        <td class="amount-column">
+                                            Rp {{ "{:,.0f}".format(transaction.amount).replace(",", ".") }}
+                                        </td>
+
+                                        <td>
+                                            <div class="table-actions">
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-outline"
+                                                    data-edit-expense
+                                                    data-id="{{ transaction.id }}"
+                                                    data-description="{{ transaction.description }}"
+                                                    data-category="{{ transaction.category }}"
+                                                    data-amount="{{ transaction.amount }}"
+                                                >
+                                                    Edit
+                                                </button>
+
+                                                <form
+                                                    method="POST"
+                                                    action="/management/expense/{{ transaction.id }}/delete"
+                                                    onsubmit="return confirm('Delete this expense transaction?');"
+                                                >
+                                                    <input
+                                                        type="hidden"
+                                                        name="csrf_token"
+                                                        value="{{ csrf_token }}"
+                                                    >
+
+                                                    <button type="submit" class="btn btn-outline">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                {% else %}
+
+                    <div class="management-empty">
+                        <h3>No Expense Transactions</h3>
+                        <p>
+                            No expense transactions have been recorded
+                            for this month.
+                        </p>
+                    </div>
+
+                {% endif %}
+
+            </section>
+
+        </div>
+
+
+    <!-- Add expense modal -->
+
+    <div
+        class="standard-modal-overlay"
+        id="expense-modal"
+        hidden
+    >
+        <div
+            class="standard-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="expense-modal-title"
+        >
+
+            <div class="standard-modal-header">
+                <div>
+                    <h2 id="expense-modal-title">Add Expense</h2>
+                    <p>
+                        Record a new expense transaction for
+                        {{ current_month.strftime("%B %Y") }}.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="standard-modal-close"
+                    id="close-expense-modal"
+                    aria-label="Close"
+                >
+                    &times;
+                </button>
+            </div>
+
+            <form method="POST" action="/management/expense" id="expense-form">
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <div class="standard-field">
+                    <label for="expense-description">
+                        Description
+                    </label>
+
+                    <input
+                        type="text"
+                        id="expense-description"
+                        name="description"
+                        maxlength="200"
+                        placeholder="e.g. Electricity bill"
+                        required
+                    >
+                </div>
+
+                <div class="standard-field">
+                    <label for="expense-category">
+                        Category
+                    </label>
+
+                    <select
+                        id="expense-category"
+                        name="category"
+                        required
+                    >
+                        <option value="fixed">Fixed</option>
+                        <option value="additional">Additional</option>
+                    </select>
+                </div>
+
+                <div class="standard-field">
+                    <label for="expense-amount">
+                        Amount (Rp)
+                    </label>
+
+                    <input
+                        type="number"
+                        id="expense-amount"
+                        name="amount"
+                        min="1"
+                        step="1"
+                        placeholder="e.g. 500000"
+                        required
+                    >
+                </div>
+
+                <div class="standard-modal-actions">
+
+                    <button
+                        type="button"
+                        class="btn btn-outline"
+                        id="cancel-expense-modal"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        Save Expense
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+
+        <footer class="dashboard-footer">
+            © 2026 Cibeo
+        </footer>
+
+    </main>
+
+</div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const modal = document.getElementById("income-modal");
+    const openButton = document.getElementById("open-income-modal");
+    const closeButton = document.getElementById("close-income-modal");
+    const cancelButton = document.getElementById("cancel-income-modal");
+    const form = document.getElementById("income-form");
+    const amountInput = document.getElementById("income-amount");
+    const descriptionInput = document.getElementById("income-description");
+
+    if (!modal || !openButton || !form) {
+        return;
+    }
+
+    function openModal() {
+        modal.hidden = false;
+        descriptionInput.focus();
+    }
+
+    function closeModal() {
+        modal.hidden = true;
+        form.reset();
+        openButton.focus();
+    }
+
+    openButton.addEventListener("click", openModal);
+
+    closeButton.addEventListener("click", closeModal);
+    cancelButton.addEventListener("click", closeModal);
+
+    modal.addEventListener("click", (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !modal.hidden) {
+            closeModal();
+        }
+    });
+
+    amountInput.addEventListener("wheel", (event) => {
+        if (document.activeElement === amountInput) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+
+    // Expense modal
+
+
+    // Edit income modal
+
+    const editIncomeModal = document.getElementById("edit-income-modal");
+    const editIncomeForm = document.getElementById("edit-income-form");
+    const closeEditIncomeButton = document.getElementById("close-edit-income-modal");
+    const cancelEditIncomeButton = document.getElementById("cancel-edit-income-modal");
+
+    const editIncomeDescription = document.getElementById("edit-income-description");
+    const editIncomeCategory = document.getElementById("edit-income-category");
+    const editIncomeAmount = document.getElementById("edit-income-amount");
+
+    const editIncomeButtons = document.querySelectorAll("[data-edit-income]");
+
+    let activeEditIncomeButton = null;
+
+    function closeEditIncomeModal() {
+        editIncomeModal.hidden = true;
+        editIncomeForm.reset();
+
+        if (activeEditIncomeButton) {
+            activeEditIncomeButton.focus();
+            activeEditIncomeButton = null;
+        }
+    }
+
+    editIncomeButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+            activeEditIncomeButton = button;
+
+            const transactionId = button.dataset.id;
+
+            editIncomeDescription.value = button.dataset.description;
+            editIncomeCategory.value = button.dataset.category;
+            editIncomeAmount.value = button.dataset.amount;
+
+            editIncomeForm.action =
+                `/management/income/${transactionId}/edit`;
+
+            editIncomeModal.hidden = false;
+            editIncomeDescription.focus();
+        });
+    });
+
+    closeEditIncomeButton.addEventListener(
+        "click",
+        closeEditIncomeModal
+    );
+
+    cancelEditIncomeButton.addEventListener(
+        "click",
+        closeEditIncomeModal
+    );
+
+    editIncomeModal.addEventListener("click", (event) => {
+        if (event.target === editIncomeModal) {
+            closeEditIncomeModal();
+        }
+    });
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && !editIncomeModal.hidden) {
+            closeEditIncomeModal();
+        }
+    });
+
+    editIncomeAmount.addEventListener("wheel", (event) => {
+        if (document.activeElement === editIncomeAmount) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+
+
+// Edit expense modal
+
+const editExpenseModal = document.getElementById("edit-expense-modal");
+const editExpenseForm = document.getElementById("edit-expense-form");
+const closeEditExpenseButton = document.getElementById("close-edit-expense-modal");
+const cancelEditExpenseButton = document.getElementById("cancel-edit-expense-modal");
+
+const editExpenseDescription = document.getElementById("edit-expense-description");
+const editExpenseCategory = document.getElementById("edit-expense-category");
+const editExpenseAmount = document.getElementById("edit-expense-amount");
+
+const editExpenseButtons = document.querySelectorAll("[data-edit-expense]");
+
+let activeEditExpenseButton = null;
+
+function closeEditExpenseModal() {
+    editExpenseModal.hidden = true;
+    editExpenseForm.reset();
+
+    if (activeEditExpenseButton) {
+        activeEditExpenseButton.focus();
+        activeEditExpenseButton = null;
+    }
+}
+
+editExpenseButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        activeEditExpenseButton = button;
+
+        const transactionId = button.dataset.id;
+
+        editExpenseDescription.value = button.dataset.description;
+        editExpenseCategory.value = button.dataset.category;
+        editExpenseAmount.value = button.dataset.amount;
+
+        editExpenseForm.action =
+            `/management/expense/${transactionId}/edit`;
+
+        editExpenseModal.hidden = false;
+        editExpenseDescription.focus();
+    });
+});
+
+closeEditExpenseButton.addEventListener(
+    "click",
+    closeEditExpenseModal
+);
+
+cancelEditExpenseButton.addEventListener(
+    "click",
+    closeEditExpenseModal
+);
+
+editExpenseModal.addEventListener("click", (event) => {
+    if (event.target === editExpenseModal) {
+        closeEditExpenseModal();
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !editExpenseModal.hidden) {
+        closeEditExpenseModal();
+    }
+});
+
+editExpenseAmount.addEventListener("wheel", (event) => {
+    if (document.activeElement === editExpenseAmount) {
+        event.preventDefault();
+    }
+}, { passive: false });
+
+    const expenseModal = document.getElementById("expense-modal");
+    const openExpenseButton = document.getElementById("open-expense-modal");
+    const closeExpenseButton = document.getElementById("close-expense-modal");
+    const cancelExpenseButton = document.getElementById("cancel-expense-modal");
+    const expenseForm = document.getElementById("expense-form");
+    const expenseAmountInput = document.getElementById("expense-amount");
+    const expenseDescriptionInput = document.getElementById("expense-description");
+
+    if (
+        expenseModal &&
+        openExpenseButton &&
+        closeExpenseButton &&
+        cancelExpenseButton &&
+        expenseForm
+    ) {
+        function openExpenseModal() {
+            expenseModal.hidden = false;
+            expenseDescriptionInput.focus();
+        }
+
+        function closeExpenseModal() {
+            expenseModal.hidden = true;
+            expenseForm.reset();
+            openExpenseButton.focus();
+        }
+
+        openExpenseButton.addEventListener("click", openExpenseModal);
+
+        closeExpenseButton.addEventListener("click", closeExpenseModal);
+        cancelExpenseButton.addEventListener("click", closeExpenseModal);
+
+        expenseModal.addEventListener("click", (event) => {
+            if (event.target === expenseModal) {
+                closeExpenseModal();
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && !expenseModal.hidden) {
+                closeExpenseModal();
+            }
+        });
+
+        expenseAmountInput.addEventListener("wheel", (event) => {
+            if (document.activeElement === expenseAmountInput) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+    }
+
+});
+</script>
+
+{% endblock %}

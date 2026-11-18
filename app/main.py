@@ -12,6 +12,8 @@ from app.database import SessionLocal
 from app.routers.auth import router as auth_router
 from app.routers.admin import router as admin_router
 from app.routers.dashboard import router as dashboard_router
+from app.routers.finance import router as finance_router
+from app.routers.profile import router as profile_router
 
 
 # Application directories
@@ -42,6 +44,8 @@ app.mount(
 app.include_router(auth_router)
 app.include_router(admin_router)
 app.include_router(dashboard_router)
+app.include_router(finance_router)
+app.include_router(profile_router)
 
 # Home page
 

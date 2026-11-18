@@ -1,0 +1,228 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}User Details - Admin Panel{% endblock %}
+
+{% block page_heading %}User Details{% endblock %}
+
+{% block page_description %}
+View account information and financial activity.
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="user-detail-page">
+
+    <div class="user-detail-back">
+        <a href="/admin/users" class="btn btn-secondary btn-sm">
+            ← Back to User Management
+        </a>
+    </div>
+
+    <section class="card user-detail-profile">
+
+        <div class="user-detail-avatar">
+            {{ user.full_name[0] | upper }}
+        </div>
+
+        <div class="user-detail-info">
+            <h3>{{ user.full_name }}</h3>
+            <p>@{{ user.username }}</p>
+
+            {% if user.is_active %}
+                <span class="status-badge status-active">Active</span>
+            {% else %}
+                <span class="status-badge status-inactive">Inactive</span>
+            {% endif %}
+        </div>
+
+    </section>
+
+    <section class="card user-detail-card">
+
+        <h3>Account Information</h3>
+
+        <div class="user-detail-grid">
+
+            <div class="user-detail-item">
+                <span>Full Name</span>
+                <strong>{{ user.full_name }}</strong>
+            </div>
+
+            <div class="user-detail-item">
+                <span>Username</span>
+                <strong>@{{ user.username }}</strong>
+            </div>
+
+            <div class="user-detail-item">
+                <span>Account Status</span>
+                <strong>
+                    {{ "Active" if user.is_active else "Inactive" }}
+                </strong>
+            </div>
+
+            <div class="user-detail-item">
+                <span>Registration Date</span>
+                <strong>{{ user.created_at.strftime("%d %B %Y, %H:%M") }}</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="card user-account-actions">
+
+        <h3>Account Actions</h3>
+
+        {% if user.is_active %}
+            <p>Deactivate this account to prevent the user from signing in.</p>
+
+            <form
+                method="POST"
+                action="/admin/users/{{ user.id }}/status"
+                data-confirm="Are you sure you want to deactivate this account?"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="deactivate"
+                >
+
+                <button type="submit" class="btn btn-danger">
+                    Deactivate User
+                </button>
+            </form>
+        {% else %}
+            <p>Reactivate this account to allow the user to sign in again.</p>
+
+            <form
+                method="POST"
+                action="/admin/users/{{ user.id }}/status"
+                data-confirm="Are you sure you want to reactivate this account?"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <input
+                    type="hidden"
+                    name="action"
+                    value="reactivate"
+                >
+
+                <button type="submit" class="btn btn-primary">
+                    Reactivate User
+                </button>
+            </form>
+        {% endif %}
+
+        <div class="user-delete-action">
+
+            <h4>Delete User</h4>
+
+            <p>
+                Remove this account from active user management.
+                Financial records will be retained.
+            </p>
+
+            <form
+                method="POST"
+                action="/admin/users/{{ user.id }}/delete"
+                data-confirm="This will soft-delete the user account. The user will no longer be able to sign in. Continue?"
+            >
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token }}"
+                >
+
+                <button type="submit" class="btn btn-danger">
+                    Delete User
+                </button>
+            </form>
+
+        </div>
+
+    </section>
+
+
+    <section class="card user-reset-password">
+
+        <h3>Reset User Password</h3>
+
+        <p>
+            Set a new password for this user.
+            All existing user sessions will be revoked.
+        </p>
+
+        <form
+            method="POST"
+            action="/admin/users/{{ user.id }}/password"
+            data-confirm="Are you sure you want to reset this user's password?"
+        >
+            <input
+                type="hidden"
+                name="csrf_token"
+                value="{{ csrf_token }}"
+            >
+
+            <div class="form-group">
+                <label for="new-password">New Password</label>
+                <input
+                    type="password"
+                    id="new-password"
+                    name="new_password"
+                    minlength="6"
+                    maxlength="128"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label for="confirm-password">Confirm New Password</label>
+                <input
+                    type="password"
+                    id="confirm-password"
+                    name="confirm_password"
+                    minlength="6"
+                    maxlength="128"
+                    autocomplete="new-password"
+                    required
+                >
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Reset Password
+            </button>
+        </form>
+
+    </section>
+
+    <section class="user-finance-stats">
+
+        <div class="card user-finance-stat">
+            <span class="stat-label">Total Income</span>
+            <strong>Rp {{ "{:,.0f}".format(income_total) }}</strong>
+            <p>{{ income_count }} transactions</p>
+        </div>
+
+        <div class="card user-finance-stat">
+            <span class="stat-label">Total Expenses</span>
+            <strong>Rp {{ "{:,.0f}".format(expense_total) }}</strong>
+            <p>{{ expense_count }} transactions</p>
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

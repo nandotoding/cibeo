@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Administrator Details - Admin Panel{% endblock %}
+
+{% block page_heading %}Administrator Details{% endblock %}
+
+{% block page_description %}
+View administrator account information.
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="admin-detail-page">
+
+    <div class="admin-detail-back">
+        <a href="/admin/administrators" class="btn btn-secondary btn-sm">
+            ← Back to Admin Management
+        </a>
+    </div>
+
+    <section class="card admin-detail-profile">
+
+        <div class="admin-detail-avatar">
+            {{ administrator.username[0] | upper }}
+        </div>
+
+        <div class="admin-detail-info">
+            <h3>@{{ administrator.username }}</h3>
+
+            <span class="status-badge status-active">
+                Administrator
+            </span>
+        </div>
+
+    </section>
+
+    <section class="card admin-detail-card">
+
+        <h3>Account Information</h3>
+
+        <div class="admin-detail-grid">
+
+            <div class="admin-detail-item">
+                <span>Username</span>
+                <strong>@{{ administrator.username }}</strong>
+            </div>
+
+            <div class="admin-detail-item">
+                <span>Role</span>
+                <strong>Administrator</strong>
+            </div>
+
+            <div class="admin-detail-item">
+                <span>Registration Date</span>
+                <strong>
+                    {{ administrator.created_at.strftime("%d %B %Y, %H:%M") }}
+                </strong>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}

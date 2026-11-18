@@ -1,0 +1,88 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Admin Management - Admin Panel{% endblock %}
+
+{% block page_heading %}Admin Management{% endblock %}
+
+{% block page_description %}
+Manage administrator accounts.
+{% endblock %}
+
+{% block admin_content %}
+
+<section class="card admin-management-card">
+
+    <div class="section-header">
+        <div>
+            <h3>Registered Administrators</h3>
+            <p>All administrator accounts have equal privileges.</p>
+        </div>
+
+        <div class="admin-management-actions">
+            <span class="user-count">
+                {{ administrators | length }} administrators
+            </span>
+
+            <a
+                href="/admin/administrators/create"
+                class="btn btn-primary btn-sm"
+            >
+                + Add Administrator
+            </a>
+        </div>
+    </div>
+
+    {% if administrators %}
+        <div class="table-responsive">
+            <table class="data-table">
+
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Registered</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for administrator in administrators %}
+                    <tr>
+                        <td>
+                            <strong>@{{ administrator.username }}</strong>
+                        </td>
+
+                        <td>
+                            <span class="status-badge status-active">
+                                Administrator
+                            </span>
+                        </td>
+
+                        <td>
+                            {{ administrator.created_at.strftime("%d %B %Y") }}
+                        </td>
+
+                        <td>
+                            <a
+                                href="/admin/administrators/{{ administrator.id }}"
+                                class="btn btn-secondary btn-sm"
+                            >
+                                View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <h3>No administrators found</h3>
+            <p>No administrator accounts are registered.</p>
+        </div>
+    {% endif %}
+
+</section>
+
+{% endblock %}

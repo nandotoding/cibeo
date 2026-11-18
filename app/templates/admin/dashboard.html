@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+
+{% block admin_title %}Dashboard - Admin Panel{% endblock %}
+
+{% block page_heading %}Dashboard{% endblock %}
+
+{% block page_description %}
+Overview of Cibeo user accounts and platform activity.
+{% endblock %}
+
+{% block admin_content %}
+
+<div class="stats-grid">
+
+    <section class="card stat-card">
+        <div class="stat-card-header">
+            <span class="stat-label">Registered Users</span>
+            <span class="stat-icon">♙</span>
+        </div>
+        <div class="stat-value">{{ registered_users }}</div>
+        <p class="stat-description">All non-deleted accounts</p>
+    </section>
+
+    <section class="card stat-card">
+        <div class="stat-card-header">
+            <span class="stat-label">Active Users</span>
+            <span class="stat-icon">✓</span>
+        </div>
+        <div class="stat-value">{{ active_users }}</div>
+        <p class="stat-description">Accounts currently active</p>
+    </section>
+
+    <section class="card stat-card">
+        <div class="stat-card-header">
+            <span class="stat-label">Inactive Users</span>
+            <span class="stat-icon">Ⅱ</span>
+        </div>
+        <div class="stat-value">{{ inactive_users }}</div>
+        <p class="stat-description">Deactivated accounts</p>
+    </section>
+
+    <section class="card stat-card">
+        <div class="stat-card-header">
+            <span class="stat-label">Deleted Users</span>
+            <span class="stat-icon">⌫</span>
+        </div>
+        <div class="stat-value">{{ deleted_users }}</div>
+        <p class="stat-description">Soft-deleted accounts</p>
+    </section>
+
+</div>
+
+{% endblock %}
