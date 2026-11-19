@@ -4,7 +4,7 @@
 
 /* 1. CSS Variables */
 :root {
-    --color-primary: #ede051;
+    --color-primary: #173b57;
     --color-primary-dark: #102c42;
     --color-secondary: #168b83;
     --color-secondary-light: #e4f4f1;
@@ -38,7 +38,7 @@
     --color-secondary: #38b7aa;
     --color-secondary-light: #193d3b;
 
-    --color-background: #ede051;
+    --color-background: #111827;
     --color-surface: #1f2937;
 
     --color-text: #e5e7eb;
